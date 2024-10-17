@@ -108,7 +108,7 @@ export default function Mainwindow() {
       }}
     >
       
-      { gridCells.map(({ row, col }) => (
+      {isActive && gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
