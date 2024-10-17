@@ -3,10 +3,8 @@ import { useDrop } from "react-dnd";
 import DraggableComponent from "./DragCom";
 import { ItemTypes } from "../types/ItemTypes";
 
-// Define the grid size, where each grid cell will be 32x32 pixels
-const GRID_SIZE = 32;
+const grd_sz = 32;
 
-// Interface for draggable items
 interface item {
   id: string;
   name: string;
@@ -15,15 +13,17 @@ interface item {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / GRID_SIZE) * GRID_SIZE;
-  const snappedY = Math.round(y / GRID_SIZE) * GRID_SIZE;
+  const snappedX = Math.round(x / grd_sz) * grd_sz;
+  const snappedY = Math.round(y / grd_sz) * grd_sz;
   return [snappedX, snappedY];
 }
 
 export default function Mainwindow() {
-  const [items, setItems] = useState<item[]>([]); 
+  const [items, setItems] = useState<item[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
   const [id, setId] = useState<string>("");
+  const [tracX, setTracX] = useState<number>(0);
+  const [tracY, setTracY] = useState<number>(0);
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.Component,
@@ -33,11 +33,29 @@ export default function Mainwindow() {
         return;
       }
       const { id, name } = item;
+      console.log(item.left, item.top);
+      console.log(delta.x, delta.y);
+      setTracX(delta.x);
+      setTracY(delta.y);
+      let flag = false;
       let left = Math.round(item.left + delta.x);
-        let top = Math.round(item.top + delta.y);
+      let top = Math.round(item.top + delta.y);
+      if (isNaN(item.left) || isNaN(item.top)) {
+        const temps = monitor.getClientOffset();
         
-
-      [left, top] = snapToGrid(left, top);
+        if(!temps)
+          return;
+        left = temps.x;
+        top = temps.y;
+       console.log('first time left, right ', left, top);
+        flag = true;
+      }
+      console.log(left, top);
+      if(!flag)
+      {
+        console.log('i am in snap');
+        [left, top] = snapToGrid(left, top);
+      }
 
       setItems((prevItems) => {
         const exist = prevItems.findIndex((existingItem) => existingItem.id === id);
@@ -55,11 +73,12 @@ export default function Mainwindow() {
       canDrop: monitor.canDrop(),
     }),
   }));
+  const isActive = isOver && canDrop;
 
-  const gridWidth = 1000; 
-  const gridHeight = 900; 
-  const numCols = Math.floor(gridWidth / GRID_SIZE); 
-  const numRows = Math.floor(gridHeight / GRID_SIZE); 
+  const gridWidth = 1000;
+  const gridHeight = 900;
+  const numCols = Math.floor(gridWidth / grd_sz);
+  const numRows = Math.floor(gridHeight / grd_sz);
 
   const gridCells = Array.from({ length: numCols * numRows }, (_, index) => ({
     row: Math.floor(index / numCols),
@@ -69,7 +88,7 @@ export default function Mainwindow() {
   useEffect(() => {
     if (id) {
       const element = document.getElementById(id);
-      console.log(element);
+      // console.log(element);
     }
   }, [id]);
 
@@ -78,8 +97,8 @@ export default function Mainwindow() {
       ref={(node) => drop((dropRef.current = node))}
       style={{
         display: "grid",
-        gridTemplateColumns: `repeat(${numCols}, ${GRID_SIZE}px)`,
-        gridTemplateRows: `repeat(${numRows}, ${GRID_SIZE}px)`,
+        gridTemplateColumns: `repeat(${numCols}, ${grd_sz}px)`,
+        gridTemplateRows: `repeat(${numRows}, ${grd_sz}px)`,
         width: `${gridWidth}px`,
         height: `${gridHeight}px`,
         border: "2px solid black",
@@ -90,8 +109,8 @@ export default function Mainwindow() {
         <div
           key={`${row}-${col}`}
           style={{
-            width: GRID_SIZE,
-            height: GRID_SIZE,
+            width: grd_sz,
+            height: grd_sz,
             border: "1px solid #ddd",
             boxSizing: "border-box",
             backgroundColor: isOver ? "#f0f0f0" : "transparent",
@@ -99,15 +118,36 @@ export default function Mainwindow() {
         />
       ))}
 
-      {items.map((item) => (
-        <DraggableComponent
-          key={item.id}
-          id={item.id}
-          name={item.name}
-          left={item.left}
-          top={item.top}
-        />
-      ))}
+      {items.map((item) => {
+        const row = Math.floor(item.top / grd_sz);
+        const col = Math.floor(item.left / grd_sz);
+        return (
+          <div key={item.id} style={{ position: 'relative' }}>
+            <DraggableComponent
+              name={item.name}
+              left={item.left}
+              top={item.top}
+              id={item.id}
+            />
+            <div style={{
+              position: 'absolute',
+              top: item.top,
+              left: item.left,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              color: 'white',
+              padding: '2px',
+              borderRadius: '3px',
+              fontSize: '12px',
+            }}>
+              <div style={{display:'flex', flexDirection:'column'}}>
+                <h4 style={{display:'flex', flexDirection:'row'}}>{`top: ${item.top}, left: ${item.left}`}</h4>
+                <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
+                <h4 style={{display:'flex', flexDirection:'row'}}>{`TracX: ${tracX}, TracY: ${tracY}`}</h4>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
