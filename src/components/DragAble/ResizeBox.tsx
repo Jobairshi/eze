@@ -19,10 +19,9 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    canDrag: () => !isResizing, // Disable dragging while resizing
+    canDrag: () => !isResizing,
   });
 
-  // Handle resizing by mouse events
   const handleResize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -36,8 +35,8 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
       const newWidth = startWidth + (moveEvent.clientX - startX);
       const newHeight = startHeight + (moveEvent.clientY - startY);
       setDimensions({
-        width: Math.max(100, newWidth), // Minimum width of 50px
-        height: Math.max(100, newHeight), // Minimum height of 50px
+        width: Math.max(100, newWidth), 
+        height: Math.max(100, newHeight),
       });
     };
 

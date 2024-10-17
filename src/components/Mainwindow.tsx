@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, isValidElement, useEffect, useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggableComponent from "./DragCom";
 import { ItemTypes } from "../types/ItemTypes";
@@ -91,11 +91,12 @@ export default function Mainwindow() {
       // console.log(element);
     }
   }, [id]);
-
+   drop(dropRef)
   return (
     <div
-      ref={(node) => drop((dropRef.current = node))}
+      ref={dropRef}
       style={{
+        
         display: "grid",
         gridTemplateColumns: `repeat(${numCols}, ${grd_sz}px)`,
         gridTemplateRows: `repeat(${numRows}, ${grd_sz}px)`,
@@ -103,17 +104,23 @@ export default function Mainwindow() {
         height: `${gridHeight}px`,
         border: "2px solid black",
         position: "relative",
+       
       }}
     >
-      {gridCells.map(({ row, col }) => (
+      
+      {isActive && gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
+            position:'absolute',
+            top: row * grd_sz,
+            left: col * grd_sz,
             width: grd_sz,
             height: grd_sz,
             border: "1px solid #ddd",
             boxSizing: "border-box",
-            backgroundColor: isOver ? "#f0f0f0" : "transparent",
+            backgroundColor:isActive? '#f0f0f0':'transparent',
+         
           }}
         />
       ))}
