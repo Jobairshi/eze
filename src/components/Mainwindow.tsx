@@ -41,7 +41,7 @@ export default function Mainwindow() {
       let left = Math.round(item.left + delta.x);
       let top = Math.round(item.top + delta.y);
       if (isNaN(item.left) || isNaN(item.top)) {
-        const temps = monitor.getClientOffset();
+        const temps = monitor.getSourceClientOffset();
         
         if(!temps)
           return;
@@ -108,7 +108,7 @@ export default function Mainwindow() {
       }}
     >
       
-      {isActive && gridCells.map(({ row, col }) => (
+      { gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
