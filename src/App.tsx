@@ -1,7 +1,9 @@
 
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
 
 import Layout from './components/Layout'
+import Mainwindow from './components/Mainwindow'
 
 
 function App() {
@@ -10,8 +12,11 @@ function App() {
 
   return (
     <>
-      <div >
-       <Layout/>
+      <div>
+        <Routes>
+          <Route path="/" element={<Layout />} />
+          <Route path ="/see" element={<Mainwindow />} />
+        </Routes>
       </div>
      
     </>

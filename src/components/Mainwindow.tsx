@@ -14,8 +14,8 @@ interface item {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap + 0.08);
+  const snappedY = Math.round(y / (grd_sz + grid_gap )) * (grd_sz + grid_gap + 0.13 );
   return [snappedX, snappedY];
 }
 
@@ -88,8 +88,8 @@ export default function Mainwindow() {
 
   useEffect(() => {
     if (id) {
-      const element = document.getElementById(id);
-      // console.log(element);
+      
+      console.log(dropRef);
     }
   }, [id]);
    drop(dropRef)
@@ -109,7 +109,7 @@ export default function Mainwindow() {
       }}
     >
       
-      {isActive && gridCells.map(({ row, col }) => (
+      {gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
