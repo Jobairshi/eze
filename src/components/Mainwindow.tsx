@@ -109,7 +109,7 @@ export default function Mainwindow() {
       }}
     >
       
-      {gridCells.map(({ row, col }) => (
+      {isActive && gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
@@ -147,11 +147,11 @@ export default function Mainwindow() {
               borderRadius: '3px',
               fontSize: '12px',
             }}>
-              <div style={{display:'flex', flexDirection:'column'}}>
+              {/* <div style={{display:'flex', flexDirection:'column'}}>
                 <h4 style={{display:'flex', flexDirection:'row'}}>{`top: ${item.top}, left: ${item.left}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}>{`TracX: ${tracX}, TracY: ${tracY}`}</h4>
-              </div>
+              </div> */}
             </div>
           </div>
         );
