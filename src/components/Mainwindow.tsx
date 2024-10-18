@@ -3,7 +3,8 @@ import { useDrop } from "react-dnd";
 import DraggableComponent from "./DragCom";
 import { ItemTypes } from "../types/ItemTypes";
 
-const grd_sz = 32;
+const grd_sz = 10;
+const grid_gap = 3;
 
 interface item {
   id: string;
@@ -13,8 +14,8 @@ interface item {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / grd_sz) * grd_sz;
-  const snappedY = Math.round(y / grd_sz) * grd_sz;
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
   return [snappedX, snappedY];
 }
 
@@ -77,8 +78,8 @@ export default function Mainwindow() {
 
   const gridWidth = 1000;
   const gridHeight = 900;
-  const numCols = Math.floor(gridWidth / grd_sz);
-  const numRows = Math.floor(gridHeight / grd_sz);
+  const numCols = Math.floor(gridWidth / (grd_sz + grid_gap));
+  const numRows = Math.floor(gridHeight / (grd_sz + grid_gap));
 
   const gridCells = Array.from({ length: numCols * numRows }, (_, index) => ({
     row: Math.floor(index / numCols),
@@ -95,39 +96,39 @@ export default function Mainwindow() {
   return (
     <div
       ref={dropRef}
+      className="parent"
       style={{
-        
         display: "grid",
         gridTemplateColumns: `repeat(${numCols}, ${grd_sz}px)`,
         gridTemplateRows: `repeat(${numRows}, ${grd_sz}px)`,
+        gridGap: `${grid_gap}px`,
         width: `${gridWidth}px`,
         height: `${gridHeight}px`,
         border: "2px solid black",
         position: "relative",
-       
       }}
     >
       
-      {isActive && gridCells.map(({ row, col }) => (
+      {gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
             position:'absolute',
-            top: row * grd_sz,
-            left: col * grd_sz,
+            margin: 2,
+            top: row * (grd_sz + grid_gap),
+            left: col * (grd_sz + grid_gap),
             width: grd_sz,
             height: grd_sz,
             border: "1px solid #ddd",
             boxSizing: "border-box",
-            backgroundColor:isActive? '#f0f0f0':'transparent',
-         
+            backgroundColor:isActive? 'black':'transparent',
           }}
         />
       ))}
 
       {items.map((item) => {
-        const row = Math.floor(item.top / grd_sz);
-        const col = Math.floor(item.left / grd_sz);
+        const row = Math.floor(item.top / (grd_sz + grid_gap));
+        const col = Math.floor(item.left / (grd_sz + grid_gap));
         return (
           <div key={item.id} style={{ position: 'relative' }}>
             <DraggableComponent

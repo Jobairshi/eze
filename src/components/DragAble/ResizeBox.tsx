@@ -2,7 +2,8 @@ import React, { useState, CSSProperties, useCallback } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
 
-const grd_sz = 32;
+const grd_sz = 10;
+const grid_gap = 3;
 
 interface DraggableProps {
   id: string;
@@ -12,8 +13,8 @@ interface DraggableProps {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / grd_sz) * grd_sz;
-  const snappedY = Math.round(y / grd_sz) * grd_sz;
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
   return [snappedX, snappedY];
 }
 
@@ -71,7 +72,7 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: "8px",
+    
     color: "white",
     transition: "background-color 0.3s ease, box-shadow 0.3s ease",
     cursor: isResizing ? "nwse-resize" : "grab",
@@ -88,13 +89,11 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
   };
 
   return (
-    <>
-      <div ref={drag} style={boxStyle} id={id}>
-        This is a resizable box
-        {dimensions.height + "px"} 
-        {dimensions.width + "px"}
-        <div style={resizeHandleStyle} onMouseDown={handleResize} />
-      </div>
-    </>
+    <div ref={drag} style={boxStyle} id={id}>
+      This is a resizable box
+      {dimensions.height + "px"} 
+      {dimensions.width + "px"}
+      <div style={resizeHandleStyle} onMouseDown={handleResize} />
+    </div>
   );
 }
