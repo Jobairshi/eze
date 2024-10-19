@@ -1,8 +1,9 @@
 import React, { useState, CSSProperties, useCallback } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
+import { GridSize } from "../../exports/GridSize";
 
-const grd_sz = 10;
+const grd_sz = GridSize;
 const grid_gap = 3;
 
 interface DraggableProps {

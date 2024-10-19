@@ -2,8 +2,9 @@ import { CSSProperties, isValidElement, useEffect, useRef, useState } from "reac
 import { useDrop } from "react-dnd";
 import DraggableComponent from "./DragCom";
 import { ItemTypes } from "../types/ItemTypes";
+import { GridSize } from "../exports/GridSize";
 
-const grd_sz = 10;
+const grd_sz = GridSize;
 const grid_gap = 3;
 
 interface item {
@@ -52,11 +53,10 @@ export default function Mainwindow() {
         flag = true;
       }
       console.log(left, top);
-      if(!flag)
-      {
-        console.log('i am in snap');
+      
+     //   console.log('i am in snap');
         [left, top] = snapToGrid(left, top);
-      }
+      
 
       setItems((prevItems) => {
         const exist = prevItems.findIndex((existingItem) => existingItem.id === id);
