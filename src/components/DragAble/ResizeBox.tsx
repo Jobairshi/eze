@@ -13,8 +13,8 @@ interface DraggableProps {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap - 0.20);
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap - 0.25); ;
   return [snappedX, snappedY];
 }
 
@@ -88,12 +88,25 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     cursor: "nwse-resize",
   };
 
+  const [isResizerEnabled, setIsResizerEnabled] = useState(false);
+
+  const hiddenStyle: CSSProperties = {
+    display: "none",
+  };
+
+
+  const enableResizer = () => {
+    setIsResizerEnabled(!isResizerEnabled);
+    console.log('resizer enabled');
+  };
+  console.log(isResizerEnabled);
   return (
-    <div ref={drag} style={boxStyle} id={id}>
-      This is a resizable box
+    <div ref={drag} style={boxStyle} id={id} onDoubleClick={enableResizer}>
+      This is a resizable box, double click to resize
       {dimensions.height + "px"} 
       {dimensions.width + "px"}
-      <div style={resizeHandleStyle} onMouseDown={handleResize} />
+      <div style={(isResizerEnabled) ? resizeHandleStyle : hiddenStyle} onMouseDown={handleResize} />
+     
     </div>
   );
 }

@@ -89,7 +89,7 @@ export default function Mainwindow() {
   useEffect(() => {
     if (id) {
       
-      console.log(dropRef);
+      console.log(dropRef.current);
     }
   }, [id]);
    drop(dropRef)
@@ -137,7 +137,7 @@ export default function Mainwindow() {
               top={item.top}
               id={item.id}
             />
-            <div style={{
+            {/* <div style={{
               position: 'absolute',
               top: item.top,
               left: item.left,
@@ -147,12 +147,12 @@ export default function Mainwindow() {
               borderRadius: '3px',
               fontSize: '12px',
             }}>
-              {/* <div style={{display:'flex', flexDirection:'column'}}>
+              <div style={{display:'flex', flexDirection:'column'}}>
                 <h4 style={{display:'flex', flexDirection:'row'}}>{`top: ${item.top}, left: ${item.left}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}>{`TracX: ${tracX}, TracY: ${tracY}`}</h4>
-              </div> */}
-            </div>
+              </div>
+            </div> */}
           </div>
         );
       })}
