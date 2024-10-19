@@ -58,7 +58,7 @@ const items: MenuItem[] = [
   {
     key: "4",
     icon: <Html5Outlined style={{ fontSize: "15px" }} />,
-    label: <SidebarItem name="Custom Html" />,
+    label: <SidebarItem name="CustomComponent" />,
   },
 ];
 

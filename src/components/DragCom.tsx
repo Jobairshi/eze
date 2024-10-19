@@ -3,6 +3,7 @@ import { useDrag } from "react-dnd";
 import Button from "./DragAble/Button";
 import { ItemTypes } from "../types/ItemTypes";
 import ResizeBox from "./DragAble/ResizeBox";
+import CustomComponent from "./DragAble/CustomComponet";
 
 
 
@@ -51,6 +52,12 @@ const DraggableComponent = ({ id, name, left, top }: DraggableProps) => {
   {
     return(
         <Button  id={id} name={name} left={left} top={top} />
+    )
+  }
+  if(name === 'CustomComponent')
+  {
+    return(
+      <CustomComponent id={id} name={name} left={left} top={top} />
     )
   }
   return (
