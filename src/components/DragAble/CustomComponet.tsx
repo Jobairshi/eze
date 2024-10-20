@@ -4,10 +4,10 @@ import { ItemTypes } from '../../types/ItemTypes';
 import { GridSize } from '../../exports/GridSize';
 
 const grd_sz = GridSize;
-
+const grid_gap = 3;
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / grd_sz) * grd_sz;
-  const snappedY = Math.round(y / grd_sz) * grd_sz;
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) *( grd_sz + grid_gap);
+  const snappedY = Math.round(y / (grd_sz + grid_gap) ) * (grd_sz + grid_gap);
   return [snappedX, snappedY];
 }
 
@@ -21,7 +21,7 @@ interface CustomComponentProps {
 
 export default function CustomComponent({ id, name, left, top }: CustomComponentProps) {
   const [htmlcss, sethtmlcss] = useState('<div> hello world</div>');
-  const [dimensions, setDimensions] = useState({ width: 300, height: 250 });
+  const [dimensions, setDimensions] = useState({ width: 200, height: 150 });
   const [isResizing, setIsResizing] = useState(false);
 
   const addRef = useRef<HTMLDivElement>(null);

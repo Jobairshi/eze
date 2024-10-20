@@ -7,8 +7,8 @@ const grd_sz = GridSize;
 const grid_gap = 3;
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap - 0.20);
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap - 0.25);
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
   return [snappedX, snappedY];
 }
 
@@ -17,7 +17,6 @@ interface DraggableProps {
   name: string;
   left: number;
   top: number;
-  
 }
 
 export default function ResizableButton({ id, name, left, top }: DraggableProps) {
@@ -34,8 +33,7 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
     canDrag: () => !isResizing,
   });
 
- 
-  const handleResize = useCallback((e: React.MouseEvent) => {
+  const handleResize = useCallback((e: React.MouseEvent, direction: string) => {
     e.preventDefault();
     setIsResizing(true);
 
@@ -45,12 +43,19 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
     const startHeight = dimensions.height;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const newWidth = startWidth + (moveEvent.clientX - startX);
-      const newHeight = startHeight + (moveEvent.clientY - startY);
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+
+      if (direction === "right") {
+        newWidth = startWidth + (moveEvent.clientX - startX);
+      } else if (direction === "bottom") {
+        newHeight = startHeight + (moveEvent.clientY - startY);
+      }
+
       const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
       setDimensions({
-        width: Math.max(100, snappedWidth), 
-        height: Math.max(50, snappedHeight),  // Set min-height for button to 50px
+        width: Math.max(100, snappedWidth), // Min width is 100px
+        height: Math.max(50, snappedHeight), // Min height is 50px
       });
     };
 
@@ -66,7 +71,7 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
 
   const enableResizer = () => {
     setIsResizerEnabled(!isResizerEnabled);
-    console.log('resizer enabled');
+    console.log('Resizer enabled');
   };
 
   const buttonWrapperStyle: CSSProperties = {
@@ -92,21 +97,31 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
     backgroundImage: "linear-gradient(45deg, #4a90e2, #0077b6)",
     color: "#fff",
     border: "none",
-   
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     transition: "background-color 0.3s ease, box-shadow 0.3s ease",
     cursor: "pointer",
   };
 
-  const resizeHandleStyle: CSSProperties = {
-    position: "absolute",
-    width: "10px",
-    height: "10px",
-    backgroundColor: "white",
-    border: "1px solid black", 
-    bottom: "0",
-    right: "0",
-    cursor: "nwse-resize",
+  const resizeHandleStyleRight: CSSProperties = {
+    position: 'absolute',
+    right: '0',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    backgroundColor: 'red',
+    height: '30px',
+    width: '10px',
+    cursor: 'e-resize',
+  };
+
+  const resizeHandleStyleBottom: CSSProperties = {
+    position: 'absolute',
+    bottom: '0',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    backgroundColor: 'red',
+    height: '10px',
+    width: '30px',
+    cursor: 's-resize',
   };
 
   const hiddenStyle: CSSProperties = {
@@ -114,11 +129,18 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
   };
 
   return (
-    <div ref={drag} style={buttonWrapperStyle} id={id} >
-      <button onDoubleClick={enableResizer}  style={buttonStyle}>
+    <div ref={drag} style={buttonWrapperStyle} id={id}>
+      <button onDoubleClick={enableResizer} style={buttonStyle}>
         Submit
       </button>
-      <div style={isResizerEnabled ? resizeHandleStyle : hiddenStyle} onMouseDown={handleResize} />
+      <div
+        style={isResizerEnabled ? resizeHandleStyleRight : hiddenStyle}
+        onMouseDown={(e) => handleResize(e, "right")}
+      />
+      <div
+        style={isResizerEnabled ? resizeHandleStyleBottom : hiddenStyle}
+        onMouseDown={(e) => handleResize(e, "bottom")}
+      />
     </div>
   );
 }
