@@ -139,7 +139,7 @@ export default function Mainwindow() {
               top={item.top}
               id={item.id}
             />
-            <div style={{
+            {/* <div style={{
               position: 'absolute',
               top: item.top,
               left: item.left,
@@ -154,7 +154,7 @@ export default function Mainwindow() {
                 <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}>{`TracX: ${tracX}, TracY: ${tracY}`}</h4>
               </div>
-            </div>
+            </div> */}
           </div>
         );
       })}

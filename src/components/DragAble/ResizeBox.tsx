@@ -20,8 +20,8 @@ interface item {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap - 0.20);
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap - 0.25); ;
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap );
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap); ;
   return [snappedX, snappedY];
 }
 
