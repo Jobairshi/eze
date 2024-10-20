@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties, useCallback, useEffect } from "react";
+import React, { useState, CSSProperties, useCallback } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
 import { GridSize } from "../../exports/GridSize";
@@ -11,22 +11,16 @@ interface DraggableProps {
   name: string;
   left: number;
   top: number;
-  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
-}
-interface item {
-  id: string;
-  name: string;
-  left: number;
-  top: number;
+  
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap );
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap); ;
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
   return [snappedX, snappedY];
 }
 
-export default function ResizeBox({ id, name, left, top,setIsacitve }: DraggableProps) {
+export default function ResizeBox({ id, name, left, top }: DraggableProps) {
   const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
   const [isResizing, setIsResizing] = useState(false);
 
@@ -38,52 +32,46 @@ export default function ResizeBox({ id, name, left, top,setIsacitve }: Draggable
     }),
     canDrag: () => !isResizing,
   });
-  if(isDragging || isResizing)
-  {
-    setIsacitve(true)
-  }
-  else{
-    setIsacitve(false)
-  }
-  const handleResize = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = dimensions.width;
-    const startHeight = dimensions.height;
+  
+  const handleResize = useCallback(
+    (e: React.MouseEvent, direction: string) => {
+      e.preventDefault();
+      setIsResizing(true);
 
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      const newWidth = startWidth + (moveEvent.clientX - startX);
-      const newHeight = startHeight + (moveEvent.clientY - startY);
-      const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
-      setDimensions({
-        width: Math.max(100, snappedWidth), 
-        height: Math.max(100, snappedHeight),
-      });
-    };
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startWidth = dimensions.width;
+      const startHeight = dimensions.height;
 
-    const onMouseUp = () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-      setIsResizing(false);
-    };
+      const onMouseMove = (moveEvent: MouseEvent) => {
+        let newWidth = startWidth;
+        let newHeight = startHeight;
 
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  }, [dimensions]);
+        if (direction === "right") {
+          newWidth = startWidth + (moveEvent.clientX - startX);
+        } else if (direction === "bottom") {
+          newHeight = startHeight + (moveEvent.clientY - startY);
+        }
 
+        const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
+        setDimensions({
+          width: Math.max(100, snappedWidth),
+          height: Math.max(100, snappedHeight),
+        });
+      };
 
-  // useEffect(() => {
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        setIsResizing(false);
+      };
 
-  //   const items = JSON.parse(localStorage.getItem("items") || "[]");
-  //   const item = items.find((item:item) => item.id === id);
-  //   // change the width and height of the found item
-  //   item
-
-
-  // }, [dimensions]);
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [dimensions]
+  );
 
   const boxStyle: CSSProperties = {
     position: "absolute",
@@ -97,41 +85,57 @@ export default function ResizeBox({ id, name, left, top,setIsacitve }: Draggable
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    
     color: "white",
     transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-    cursor: isResizing ? "nwse-resize" : "grab",
+    cursor:"grab",
   };
 
-  const resizeHandleStyle: CSSProperties = {
+  const resizeBarStyle: CSSProperties = {
     position: "absolute",
-    width: "10px",
-    height: "10px",
-    backgroundColor: "white",
-    bottom: "0",
+    backgroundColor: "#fff",
+    cursor: "e-resize",
+    zIndex: 10,
+  };
+
+  const resizeRightStyle: CSSProperties = {
+    ...resizeBarStyle,
     right: "0",
-    cursor: "nwse-resize",
+    top: "50%",
+    transform: "translateY(-50%)", 
+    backgroundColor: "red",
+    height: "30px", 
+    width: "10px", 
   };
-
-  const [isResizerEnabled, setIsResizerEnabled] = useState(false);
-
-  const hiddenStyle: CSSProperties = {
-    display: "none",
+  const resizeBottomStyle: CSSProperties = {
+    ...resizeBarStyle,
+    bottom: "0", 
+    left: "50%",
+    transform: "translateX(-50%)", 
+    backgroundColor: "red",
+    height: "10px",
+    width: "30px", 
+    cursor:'s-resize'
   };
+  const [isShow, setisShow] = useState(false);
 
+  function handleResizing()
+  {
+    setisShow(!isShow);
+  }
 
-  const enableResizer = () => {
-    setIsResizerEnabled(!isResizerEnabled);
-    console.log('resizer enabled');
-  };
-  console.log(isResizerEnabled);
   return (
-    <div ref={drag} style={boxStyle} id={id} onDoubleClick={enableResizer}>
-      This is a resizable box, double click to resize
-      {dimensions.height + "px"} 
-      {dimensions.width + "px"}
-      <div style={(isResizerEnabled) ? resizeHandleStyle : hiddenStyle} onMouseDown={handleResize} />
-     
+    <div onDoubleClick={handleResizing} ref={drag} style={boxStyle} id={id}>
+      Resizable Box
+      <div
+        hidden = {isShow}
+        style={resizeRightStyle}
+        onMouseDown={(e) => handleResize(e, "right")}
+      />
+      <div
+        hidden = {isShow}
+        style={resizeBottomStyle}
+        onMouseDown={(e) => handleResize(e, "bottom")}
+      />
     </div>
   );
 }

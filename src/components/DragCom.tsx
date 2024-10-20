@@ -14,10 +14,10 @@ interface DraggableProps {
   name: string;
   left: number;
   top: number;
-  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
+  
 }
 
-const DraggableComponent = ({ id, name, left, top, setIsacitve }: DraggableProps) => {
+const DraggableComponent = ({ id, name, left, top}: DraggableProps) => {
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.Component,
     item: { id, name, left, top },
@@ -40,25 +40,25 @@ const DraggableComponent = ({ id, name, left, top, setIsacitve }: DraggableProps
   };
   if (name === "Box") {
       return (
-          <ResizeBox setIsacitve={setIsacitve} id={id} name={name} left={left} top={top} />
+          <ResizeBox  id={id} name={name} left={left} top={top} />
       );
   }
   if(name === 'Button')
   {
     return(
-        <Button setIsacitve={setIsacitve} id={id} name={name} left={left} top={top} />
+        <Button  id={id} name={name} left={left} top={top} />
     )
   }
   if(name === 'Image')
   {
     return(
-        <Button setIsacitve={setIsacitve}  id={id} name={name} left={left} top={top} />
+        <Button   id={id} name={name} left={left} top={top} />
     )
   }
   if(name === 'CustomComponent')
   {
     return(
-      <CustomComponent setIsacitve={setIsacitve} id={id} name={name} left={left} top={top} />
+      <CustomComponent  id={id} name={name} left={left} top={top} />
     )
   }
   return (

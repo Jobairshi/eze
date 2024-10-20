@@ -16,10 +16,10 @@ interface CustomComponentProps {
   name: string;
   left: number;
   top: number;
-  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
+  
 }
 
-export default function CustomComponent({ id, name, left, top,setIsacitve }: CustomComponentProps) {
+export default function CustomComponent({ id, name, left, top }: CustomComponentProps) {
   const [htmlcss, sethtmlcss] = useState('<div> hello world</div>');
   const [dimensions, setDimensions] = useState({ width: 300, height: 250 });
   const [isResizing, setIsResizing] = useState(false);
@@ -35,29 +35,21 @@ export default function CustomComponent({ id, name, left, top,setIsacitve }: Cus
     canDrag: () => !isResizing,
   });
 
-  if(isDragging || isResizing)
-  {
-    setIsacitve(true)
-  }
-  else{
-    setIsacitve(false)
-  }
-
   const handleSubmit = () => {
     console.log('htmlcss:', htmlcss);
     const newComponent = document.createElement('div');
     newComponent.innerHTML = htmlcss;
   
     const allChildNodes = addRef.current?.childNodes;
-    console.log(allChildNodes); // store all the nodes
+    console.log(allChildNodes); 
 
-    while (addRef.current && addRef.current.childNodes.length > 1) {
+    while (addRef.current && addRef.current.childNodes.length > 2) {
       addRef.current.removeChild(addRef.current.childNodes[0]);
     }
     addRef.current?.appendChild(newComponent);
   };
 
-  const handleResize = useCallback((e: React.MouseEvent) => {
+  const handleResize = useCallback((e: React.MouseEvent, direction: 'right' | 'bottom') => {
     e.preventDefault();
     setIsResizing(true);
 
@@ -67,8 +59,15 @@ export default function CustomComponent({ id, name, left, top,setIsacitve }: Cus
     const startHeight = dimensions.height;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const newWidth = startWidth + (moveEvent.clientX - startX);
-      const newHeight = startHeight + (moveEvent.clientY - startY);
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+
+      if (direction === 'right') {
+        newWidth = startWidth + (moveEvent.clientX - startX);
+      } else if (direction === 'bottom') {
+        newHeight = startHeight + (moveEvent.clientY - startY);
+      }
+
       const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
       setDimensions({
         width: Math.max(200, snappedWidth),
@@ -97,11 +96,6 @@ export default function CustomComponent({ id, name, left, top,setIsacitve }: Cus
     cursor: isResizing ? 'nwse-resize' : 'grab',
   };
 
-  const resizeHandleStyle: React.CSSProperties = {
-    ...styles.resizeHandle,
-    cursor: 'nwse-resize',
-  };
-
   drag(addRef);
 
   return (
@@ -115,8 +109,16 @@ export default function CustomComponent({ id, name, left, top,setIsacitve }: Cus
       <button style={styles.button} onClick={handleSubmit}>
         Submit
       </button>
-     
-      <div style={resizeHandleStyle} onMouseDown={handleResize} />
+      {/* Right Resizing Handle */}
+      <div
+        style={styles.resizeRightHandle}
+        onMouseDown={(e) => handleResize(e, 'right')}
+      />
+      {/* Bottom Resizing Handle */}
+      <div
+        style={styles.resizeBottomHandle}
+        onMouseDown={(e) => handleResize(e, 'bottom')}
+      />
     </div>
   );
 }
@@ -156,12 +158,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
     transition: 'background-color 0.3s ease',
   },
-  resizeHandle: {
+  resizeRightHandle: {
     position: 'absolute',
-    width: '15px',
-    height: '15px',
-    backgroundColor: '#0077b6',
-    bottom: '5px',
-    right: '5px',
+    right: '0',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    backgroundColor: 'red',
+    height: '30px',
+    width: '10px',
+    cursor: 'e-resize',
+  },
+  resizeBottomHandle: {
+    position: 'absolute',
+    bottom: '0',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    backgroundColor: 'red',
+    height: '10px',
+    width: '30px',
+    cursor: 's-resize',
   },
 };

@@ -21,9 +21,9 @@ function snapToGrid(x: number, y: number): [number, number] {
 }
 
 export default function Mainwindow() {
-  const [isActive,  setIsacitve] = useState(false);
-  const [items, setItems] = useState<item[]>(
-    JSON.parse(localStorage.getItem("items") || "[]")
+  
+  const [items, setItems] = useState<item[]>( []
+    // JSON.parse(localStorage.getItem("items") || "[]")
   );
   const dropRef = useRef<HTMLDivElement>(null);
   const [id, setId] = useState<string>("");
@@ -46,7 +46,7 @@ export default function Mainwindow() {
       let left = Math.round(item.left + delta.x);
       let top = Math.round(item.top + delta.y);
       if (isNaN(item.left) || isNaN(item.top)) {
-        const temps = monitor.getSourceClientOffset();
+        const temps = monitor.getInitialClientOffset();
         
         if(!temps)
           return;
@@ -89,12 +89,13 @@ export default function Mainwindow() {
     col: index % numCols,
   }));
 
-  useEffect(() => {
-    if (id) {
-      localStorage.setItem("items", JSON.stringify(items));
-      console.log(dropRef.current);
-    }
-  }, [id]);
+  // useEffect(() => {
+  //   if (id) {
+  //     //localStorage.setItem("items", JSON.stringify(items));
+  //     console.log(dropRef.current);
+  //   }
+  // }, [id]);
+   const isActive = isOver && canDrop;
    drop(dropRef)
   return (
     <div
@@ -112,7 +113,7 @@ export default function Mainwindow() {
       }}
     >
       
-      {gridCells.map(({ row, col }) => (
+      { gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
@@ -130,12 +131,12 @@ export default function Mainwindow() {
       ))}
 
       {items.map((item) => {
-        const row = Math.floor(item.top / (grd_sz + grid_gap));
-        const col = Math.floor(item.left / (grd_sz + grid_gap));
+        const row = Math.ceil(item.top / (grd_sz + grid_gap));
+        const col = Math.ceil(item.left / (grd_sz + grid_gap));
         return (
-          <div key={item.id} style={{ position: 'relative' }}>
+          <div  key={item.id} style={{ position: 'relative' }}>
             <DraggableComponent
-            setIsacitve={setIsacitve}
+         
               name={item.name}
               left={item.left}
               top={item.top}
@@ -152,9 +153,8 @@ export default function Mainwindow() {
               fontSize: '12px',
             }}>
               <div style={{display:'flex', flexDirection:'column'}}>
-                <h4 style={{display:'flex', flexDirection:'row'}}>{`top: ${item.top}, left: ${item.left}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
-                <h4 style={{display:'flex', flexDirection:'row'}}>{`TracX: ${tracX}, TracY: ${tracY}`}</h4>
+                <h4 style={{display:'flex', flexDirection:'row'}}> {`Top: ${Math.floor(item.top)}, Left: ${Math.floor(item.left)}`}</h4>
               </div>
             </div> */}
           </div>
