@@ -21,7 +21,9 @@ function snapToGrid(x: number, y: number): [number, number] {
 }
 
 export default function Mainwindow() {
-  const [items, setItems] = useState<item[]>([]);
+  const [items, setItems] = useState<item[]>(
+    JSON.parse(localStorage.getItem("items") || "[]")
+  );
   const dropRef = useRef<HTMLDivElement>(null);
   const [id, setId] = useState<string>("");
   const [tracX, setTracX] = useState<number>(0);
@@ -88,7 +90,7 @@ export default function Mainwindow() {
 
   useEffect(() => {
     if (id) {
-      
+      localStorage.setItem("items", JSON.stringify(items));
       console.log(dropRef.current);
     }
   }, [id]);
@@ -137,7 +139,7 @@ export default function Mainwindow() {
               top={item.top}
               id={item.id}
             />
-            {/* <div style={{
+            <div style={{
               position: 'absolute',
               top: item.top,
               left: item.left,
@@ -152,7 +154,7 @@ export default function Mainwindow() {
                 <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
                 <h4 style={{display:'flex', flexDirection:'row'}}>{`TracX: ${tracX}, TracY: ${tracY}`}</h4>
               </div>
-            </div> */}
+            </div>
           </div>
         );
       })}

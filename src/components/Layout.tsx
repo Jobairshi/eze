@@ -1,6 +1,7 @@
 import SideBar from './Menu';
 import Mainwindow from './Mainwindow';
 import { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Layout() {
   const style: CSSProperties = {
@@ -16,6 +17,7 @@ export default function Layout() {
 
   return (
     <div style={style}>
+      <Link to="/see">See</Link>
       <SideBar />
       <Mainwindow />
     </div>

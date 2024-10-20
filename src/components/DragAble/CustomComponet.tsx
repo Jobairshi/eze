@@ -1,6 +1,15 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from '../../types/ItemTypes'; 
+import { GridSize } from '../../exports/GridSize';
+
+const grd_sz = GridSize;
+
+function snapToGrid(x: number, y: number): [number, number] {
+  const snappedX = Math.round(x / grd_sz) * grd_sz;
+  const snappedY = Math.round(y / grd_sz) * grd_sz;
+  return [snappedX, snappedY];
+}
 
 interface CustomComponentProps {
   id: string;
@@ -10,7 +19,7 @@ interface CustomComponentProps {
 }
 
 export default function CustomComponent({ id, name, left, top }: CustomComponentProps) {
-  const [message, setMessage] = useState('<div> hellow world</div>');
+  const [htmlcss, sethtmlcss] = useState('<div> hello world</div>');
   const [dimensions, setDimensions] = useState({ width: 300, height: 250 });
   const [isResizing, setIsResizing] = useState(false);
 
@@ -26,12 +35,12 @@ export default function CustomComponent({ id, name, left, top }: CustomComponent
   });
 
   const handleSubmit = () => {
-    console.log('Message:', message);
+    console.log('htmlcss:', htmlcss);
     const newComponent = document.createElement('div');
-    newComponent.innerHTML = message;
+    newComponent.innerHTML = htmlcss;
   
     const allChildNodes = addRef.current?.childNodes;
-    console.log(allChildNodes); // storeed al the nodes
+    console.log(allChildNodes); // store all the nodes
 
     while (addRef.current && addRef.current.childNodes.length > 1) {
       addRef.current.removeChild(addRef.current.childNodes[0]);
@@ -51,9 +60,10 @@ export default function CustomComponent({ id, name, left, top }: CustomComponent
     const onMouseMove = (moveEvent: MouseEvent) => {
       const newWidth = startWidth + (moveEvent.clientX - startX);
       const newHeight = startHeight + (moveEvent.clientY - startY);
+      const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
       setDimensions({
-        width: Math.max(200, newWidth),
-        height: Math.max(150, newHeight), 
+        width: Math.max(200, snappedWidth),
+        height: Math.max(150, snappedHeight), 
       });
     };
 
@@ -90,8 +100,8 @@ export default function CustomComponent({ id, name, left, top }: CustomComponent
       <textarea
         style={styles.textArea}
         placeholder="Write your custom component here..."
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        value={htmlcss}
+        onChange={(e) => sethtmlcss(e.target.value)}
       />
       <button style={styles.button} onClick={handleSubmit}>
         Submit

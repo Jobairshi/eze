@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties, useCallback } from "react";
+import React, { useState, CSSProperties, useCallback, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
 import { GridSize } from "../../exports/GridSize";
@@ -7,6 +7,12 @@ const grd_sz = GridSize;
 const grid_gap = 3;
 
 interface DraggableProps {
+  id: string;
+  name: string;
+  left: number;
+  top: number;
+}
+interface item {
   id: string;
   name: string;
   left: number;
@@ -60,6 +66,17 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
   }, [dimensions]);
+
+
+  // useEffect(() => {
+
+  //   const items = JSON.parse(localStorage.getItem("items") || "[]");
+  //   const item = items.find((item:item) => item.id === id);
+  //   // change the width and height of the found item
+  //   item
+
+
+  // }, [dimensions]);
 
   const boxStyle: CSSProperties = {
     position: "absolute",
