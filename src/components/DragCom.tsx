@@ -46,19 +46,19 @@ const DraggableComponent = ({ id, name, left, top, setIsacitve }: DraggableProps
   if(name === 'Button')
   {
     return(
-        <Button id={id} name={name} left={left} top={top} />
+        <Button setIsacitve={setIsacitve} id={id} name={name} left={left} top={top} />
     )
   }
   if(name === 'Image')
   {
     return(
-        <Button  id={id} name={name} left={left} top={top} />
+        <Button setIsacitve={setIsacitve}  id={id} name={name} left={left} top={top} />
     )
   }
   if(name === 'CustomComponent')
   {
     return(
-      <CustomComponent id={id} name={name} left={left} top={top} />
+      <CustomComponent setIsacitve={setIsacitve} id={id} name={name} left={left} top={top} />
     )
   }
   return (

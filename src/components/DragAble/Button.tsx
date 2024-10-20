@@ -17,9 +17,10 @@ interface DraggableProps {
   name: string;
   left: number;
   top: number;
+  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function ResizableButton({ id, name, left, top }: DraggableProps) {
+export default function ResizableButton({ id, name, left, top,setIsacitve }: DraggableProps) {
   const [dimensions, setDimensions] = useState({ width: 120, height: 50 });
   const [isResizing, setIsResizing] = useState(false);
   const [isResizerEnabled, setIsResizerEnabled] = useState(false);
@@ -33,6 +34,13 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
     canDrag: () => !isResizing,
   });
 
+  if(isDragging || isResizing)
+  {
+    setIsacitve(true)
+  }
+  else{
+    setIsacitve(false)
+  }
   const handleResize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);

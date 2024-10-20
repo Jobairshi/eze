@@ -16,9 +16,10 @@ interface CustomComponentProps {
   name: string;
   left: number;
   top: number;
+  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CustomComponent({ id, name, left, top }: CustomComponentProps) {
+export default function CustomComponent({ id, name, left, top,setIsacitve }: CustomComponentProps) {
   const [htmlcss, sethtmlcss] = useState('<div> hello world</div>');
   const [dimensions, setDimensions] = useState({ width: 300, height: 250 });
   const [isResizing, setIsResizing] = useState(false);
@@ -33,6 +34,14 @@ export default function CustomComponent({ id, name, left, top }: CustomComponent
     }),
     canDrag: () => !isResizing,
   });
+
+  if(isDragging || isResizing)
+  {
+    setIsacitve(true)
+  }
+  else{
+    setIsacitve(false)
+  }
 
   const handleSubmit = () => {
     console.log('htmlcss:', htmlcss);
