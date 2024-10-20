@@ -109,12 +109,12 @@ export default function CustomComponent({ id, name, left, top }: CustomComponent
       <button style={styles.button} onClick={handleSubmit}>
         Submit
       </button>
-      {/* Right Resizing Handle */}
+     
       <div
         style={styles.resizeRightHandle}
         onMouseDown={(e) => handleResize(e, 'right')}
       />
-      {/* Bottom Resizing Handle */}
+     
       <div
         style={styles.resizeBottomHandle}
         onMouseDown={(e) => handleResize(e, 'bottom')}
