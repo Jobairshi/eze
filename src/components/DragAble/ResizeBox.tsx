@@ -11,6 +11,7 @@ interface DraggableProps {
   name: string;
   left: number;
   top: number;
+  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface item {
   id: string;
@@ -25,7 +26,7 @@ function snapToGrid(x: number, y: number): [number, number] {
   return [snappedX, snappedY];
 }
 
-export default function ResizeBox({ id, name, left, top }: DraggableProps) {
+export default function ResizeBox({ id, name, left, top,setIsacitve }: DraggableProps) {
   const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
   const [isResizing, setIsResizing] = useState(false);
 
@@ -37,7 +38,13 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     }),
     canDrag: () => !isResizing,
   });
-
+  if(isDragging || isResizing)
+  {
+    setIsacitve(true)
+  }
+  else{
+    setIsacitve(false)
+  }
   const handleResize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);

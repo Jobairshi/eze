@@ -14,9 +14,10 @@ interface DraggableProps {
   name: string;
   left: number;
   top: number;
+  setIsacitve:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const DraggableComponent = ({ id, name, left, top }: DraggableProps) => {
+const DraggableComponent = ({ id, name, left, top, setIsacitve }: DraggableProps) => {
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.Component,
     item: { id, name, left, top },
@@ -39,7 +40,7 @@ const DraggableComponent = ({ id, name, left, top }: DraggableProps) => {
   };
   if (name === "Box") {
       return (
-          <ResizeBox id={id} name={name} left={left} top={top} />
+          <ResizeBox setIsacitve={setIsacitve} id={id} name={name} left={left} top={top} />
       );
   }
   if(name === 'Button')

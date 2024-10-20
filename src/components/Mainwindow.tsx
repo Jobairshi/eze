@@ -21,6 +21,7 @@ function snapToGrid(x: number, y: number): [number, number] {
 }
 
 export default function Mainwindow() {
+  const [isActive,  setIsacitve] = useState(false);
   const [items, setItems] = useState<item[]>(
     JSON.parse(localStorage.getItem("items") || "[]")
   );
@@ -76,7 +77,7 @@ export default function Mainwindow() {
       canDrop: monitor.canDrop(),
     }),
   }));
-  const isActive = isOver && canDrop;
+  
 
   const gridWidth = 1000;
   const gridHeight = 900;
@@ -134,6 +135,7 @@ export default function Mainwindow() {
         return (
           <div key={item.id} style={{ position: 'relative' }}>
             <DraggableComponent
+            setIsacitve={setIsacitve}
               name={item.name}
               left={item.left}
               top={item.top}
