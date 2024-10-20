@@ -5,6 +5,8 @@ import { GridSize } from '../../exports/GridSize';
 
 const grd_sz = GridSize;
 const grid_gap = 3;
+const containerWidth = 1000;
+const containerHeight = 900;
 function snapToGrid(x: number, y: number): [number, number] {
   const snappedX = Math.round(x / (grd_sz + grid_gap)) *( grd_sz + grid_gap);
   const snappedY = Math.round(y / (grd_sz + grid_gap) ) * (grd_sz + grid_gap);
@@ -63,9 +65,9 @@ export default function CustomComponent({ id, name, left, top }: CustomComponent
       let newHeight = startHeight;
 
       if (direction === 'right') {
-        newWidth = startWidth + (moveEvent.clientX - startX);
+        newWidth = Math.min(containerWidth - left, startWidth + (moveEvent.clientX - startX));
       } else if (direction === 'bottom') {
-        newHeight = startHeight + (moveEvent.clientY - startY);
+        newHeight = Math.min(containerHeight - top, startHeight + (moveEvent.clientY - startY));
       }
 
       const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);

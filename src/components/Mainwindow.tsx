@@ -142,7 +142,7 @@ export default function Mainwindow() {
               top={item.top}
               id={item.id}
             />
-            {/* <div style={{
+            <div style={{
               position: 'absolute',
               top: item.top,
               left: item.left,
@@ -154,9 +154,9 @@ export default function Mainwindow() {
             }}>
               <div style={{display:'flex', flexDirection:'column'}}>
                 <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
-                <h4 style={{display:'flex', flexDirection:'row'}}> {`Top: ${Math.floor(item.top)}, Left: ${Math.floor(item.left)}`}</h4>
+                {/* <h4 style={{display:'flex', flexDirection:'row'}}> {`Top: ${Math.floor(item.top)}, Left: ${Math.floor(item.left)}`}</h4> */}
               </div>
-            </div> */}
+            </div>
           </div>
         );
       })}

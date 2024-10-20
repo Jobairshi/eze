@@ -5,7 +5,8 @@ import { GridSize } from "../../exports/GridSize";
 
 const grd_sz = GridSize;
 const grid_gap = 3;
-
+const containerWidth = 1000;
+const containerHeight = 900;
 function snapToGrid(x: number, y: number): [number, number] {
   const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
   const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
@@ -33,41 +34,44 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
     canDrag: () => !isResizing,
   });
 
-  const handleResize = useCallback((e: React.MouseEvent, direction: string) => {
-    e.preventDefault();
-    setIsResizing(true);
+  const handleResize = useCallback(
+    (e: React.MouseEvent, direction: string) => {
+      e.preventDefault();
+      setIsResizing(true);
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = dimensions.width;
-    const startHeight = dimensions.height;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startWidth = dimensions.width;
+      const startHeight = dimensions.height;
 
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      let newWidth = startWidth;
-      let newHeight = startHeight;
+      const onMouseMove = (moveEvent: MouseEvent) => {
+        let newWidth = startWidth;
+        let newHeight = startHeight;
 
-      if (direction === "right") {
-        newWidth = startWidth + (moveEvent.clientX - startX);
-      } else if (direction === "bottom") {
-        newHeight = startHeight + (moveEvent.clientY - startY);
-      }
+        if (direction === 'right') {
+          newWidth = Math.min(containerWidth - left, startWidth + (moveEvent.clientX - startX));
+        } else if (direction === 'bottom') {
+          newHeight = Math.min(containerHeight - top, startHeight + (moveEvent.clientY - startY));
+        }
 
-      const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
-      setDimensions({
-        width: Math.max(100, snappedWidth), // Min width is 100px
-        height: Math.max(50, snappedHeight), // Min height is 50px
-      });
-    };
+        const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
+        setDimensions({
+          width: Math.max(120, snappedWidth),
+          height: Math.max(50, snappedHeight),
+        });
+      };
 
-    const onMouseUp = () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-      setIsResizing(false);
-    };
+      const onMouseUp = () => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        setIsResizing(false);
+      };
 
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  }, [dimensions]);
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [dimensions, left, top]
+  );
 
   const enableResizer = () => {
     setIsResizerEnabled(!isResizerEnabled);

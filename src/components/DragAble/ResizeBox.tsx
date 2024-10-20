@@ -5,13 +5,14 @@ import { GridSize } from "../../exports/GridSize";
 
 const grd_sz = GridSize;
 const grid_gap = 3;
+const containerWidth = 1000;
+const containerHeight = 900;
 
 interface DraggableProps {
   id: string;
   name: string;
   left: number;
   top: number;
-  
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
@@ -33,7 +34,6 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     canDrag: () => !isResizing,
   });
 
-  
   const handleResize = useCallback(
     (e: React.MouseEvent, direction: string) => {
       e.preventDefault();
@@ -48,10 +48,10 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
         let newWidth = startWidth;
         let newHeight = startHeight;
 
-        if (direction === "right") {
-          newWidth = startWidth + (moveEvent.clientX - startX);
-        } else if (direction === "bottom") {
-          newHeight = startHeight + (moveEvent.clientY - startY);
+        if (direction === 'right') {
+          newWidth = Math.min(containerWidth - left, startWidth + (moveEvent.clientX - startX));
+        } else if (direction === 'bottom') {
+          newHeight = Math.min(containerHeight - top, startHeight + (moveEvent.clientY - startY));
         }
 
         const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
@@ -70,7 +70,7 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [dimensions]
+    [dimensions, left, top]
   );
 
   const boxStyle: CSSProperties = {
@@ -87,7 +87,7 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     justifyContent: "center",
     color: "white",
     transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-    cursor:"grab",
+    cursor: isResizing ? "nwse-resize" : "grab",
   };
 
   const resizeBarStyle: CSSProperties = {
@@ -106,6 +106,7 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     height: "30px", 
     width: "10px", 
   };
+
   const resizeBottomStyle: CSSProperties = {
     ...resizeBarStyle,
     bottom: "0", 
@@ -114,28 +115,30 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     backgroundColor: "red",
     height: "10px",
     width: "30px", 
-    cursor:'s-resize'
+    cursor: 's-resize',
   };
-  const [isShow, setisShow] = useState(false);
 
-  function handleResizing()
-  {
-    setisShow(!isShow);
+  const [isShow, setIsShow] = useState(false);
+
+  function handleResizing() {
+    setIsShow(!isShow);
   }
 
   return (
     <div onDoubleClick={handleResizing} ref={drag} style={boxStyle} id={id}>
       Resizable Box
-      <div
-        hidden = {isShow}
-        style={resizeRightStyle}
-        onMouseDown={(e) => handleResize(e, "right")}
-      />
-      <div
-        hidden = {isShow}
-        style={resizeBottomStyle}
-        onMouseDown={(e) => handleResize(e, "bottom")}
-      />
+      {!isShow && (
+        <>
+          <div
+            style={resizeRightStyle}
+            onMouseDown={(e) => handleResize(e, "right")}
+          />
+          <div
+            style={resizeBottomStyle}
+            onMouseDown={(e) => handleResize(e, "bottom")}
+          />
+        </>
+      )}
     </div>
   );
 }
