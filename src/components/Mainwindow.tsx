@@ -92,7 +92,8 @@ export default function Mainwindow() {
   // useEffect(() => {
   //   if (id) {
   //     //localStorage.setItem("items", JSON.stringify(items));
-  //     console.log(dropRef.current);
+  //     localStorage.setItem('fullwindow', JSON.stringify(dropRef.current));
+  //     // console.log(dropRef.current);
   //   }
   // }, [id]);
    const isActive = isOver && canDrop;

@@ -2,16 +2,12 @@ import React, { useState, CSSProperties, useCallback } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
 import { GridSize } from "../../exports/GridSize";
+import DropdownItem from "../SubComponents/DropDown"; // Assuming this is your form
 
 const grd_sz = GridSize;
 const grid_gap = 3;
 const containerWidth = 1000;
 const containerHeight = 900;
-function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
-  return [snappedX, snappedY];
-}
 
 interface DraggableProps {
   id: string;
@@ -20,14 +16,27 @@ interface DraggableProps {
   top: number;
 }
 
-export default function ResizableButton({ id, name, left, top }: DraggableProps) {
-  const [dimensions, setDimensions] = useState({ width: 120, height: 50 });
+function snapToGrid(x: number, y: number): [number, number] {
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  return [snappedX, snappedY];
+}
+
+export default function Button({ id, name, left, top }: DraggableProps) {
+  const [dimensions, setDimensions] = useState({ width: 100, height: 50 });
   const [isResizing, setIsResizing] = useState(false);
-  const [isResizerEnabled, setIsResizerEnabled] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
 
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.Component,
-    item: { id, name, left, top, width: dimensions.width, height: dimensions.height },
+    item: {
+      id,
+      name,
+      left,
+      top,
+      width: dimensions.width,
+      height: dimensions.height,
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -48,15 +57,21 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
         let newWidth = startWidth;
         let newHeight = startHeight;
 
-        if (direction === 'right') {
-          newWidth = Math.min(containerWidth - left, startWidth + (moveEvent.clientX - startX));
-        } else if (direction === 'bottom') {
-          newHeight = Math.min(containerHeight - top, startHeight + (moveEvent.clientY - startY));
+        if (direction === "right") {
+          newWidth = Math.min(
+            containerWidth - left,
+            startWidth + (moveEvent.clientX - startX)
+          );
+        } else if (direction === "bottom") {
+          newHeight = Math.min(
+            containerHeight - top,
+            startHeight + (moveEvent.clientY - startY)
+          );
         }
 
         const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
         setDimensions({
-          width: Math.max(120, snappedWidth),
+          width: Math.max(100, snappedWidth),
           height: Math.max(50, snappedHeight),
         });
       };
@@ -73,78 +88,120 @@ export default function ResizableButton({ id, name, left, top }: DraggableProps)
     [dimensions, left, top]
   );
 
-  const enableResizer = () => {
-    setIsResizerEnabled(!isResizerEnabled);
-    console.log('Resizer enabled');
+  const handleRightClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Toggle form visibility
+    setFormVisible((prev) => !prev);
   };
 
-  const buttonWrapperStyle: CSSProperties = {
+  const [borderRadius, setBorderRadius] = useState(0);
+  const [backgroundColor, setBackgroundColor] = useState("");
+  const [textColor, setTextColor] = useState("");
+
+  const boxStyle: CSSProperties = {
     position: "absolute",
     left,
     top,
     width: `${dimensions.width}px`,
     height: `${dimensions.height}px`,
     opacity: isDragging ? 0 : 1,
-    cursor: isResizing ? "nwse-resize" : "grab",
+    backgroundColor: backgroundColor || "green", 
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-  };
-
-  const buttonStyle: CSSProperties = {
-    width: "100%",
-    height: "100%",
-    padding: "10px 20px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    backgroundColor: "#4a90e2",
-    backgroundImage: "linear-gradient(45deg, #4a90e2, #0077b6)",
-    color: "#fff",
-    border: "none",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    justifyContent: "center",
+    color: textColor || "white",
+    borderRadius: `${borderRadius}px`,
     transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-    cursor: "pointer",
+    cursor: isResizing ? "nwse-resize" : "pointer",
   };
 
-  const resizeHandleStyleRight: CSSProperties = {
-    position: 'absolute',
-    right: '0',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    backgroundColor: 'red',
-    height: '30px',
-    width: '10px',
-    cursor: 'e-resize',
+  const resizeBarStyle: CSSProperties = {
+    position: "absolute",
+    backgroundColor: "#fff",
+    cursor: "e-resize",
+    zIndex: 10,
   };
 
-  const resizeHandleStyleBottom: CSSProperties = {
-    position: 'absolute',
-    bottom: '0',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: 'red',
-    height: '10px',
-    width: '30px',
-    cursor: 's-resize',
+  const resizeRightStyle: CSSProperties = {
+    ...resizeBarStyle,
+    right: "0",
+    top: "50%",
+    transform: "translateY(-50%)",
+    backgroundColor: "red",
+    height: "30px",
+    width: "10px",
   };
 
-  const hiddenStyle: CSSProperties = {
-    display: "none",
+  const resizeBottomStyle: CSSProperties = {
+    ...resizeBarStyle,
+    bottom: "0",
+    left: "50%",
+    transform: "translateX(-50%)",
+    backgroundColor: "red",
+    height: "10px",
+    width: "30px",
+    cursor: "s-resize",
   };
+
+  const formStyle: CSSProperties = {
+    position: "absolute",
+    left: left + dimensions.width + 10,
+    top: top,
+    backgroundColor: "#fff",
+    border: "1px solid black",
+    zIndex: 100,
+    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+    display: formVisible ? "block" : "none",
+  };
+
+  function chagneBorderRadius(radius: number) {
+    setBorderRadius(radius);
+  }
+
+  function changeBackgroundColor(color: string) {
+    setBackgroundColor(color);
+  }
+  function changeTextColor(color: string) {
+    setTextColor(color);
+  }
+
+  const [resize, setResize] = useState(false);
+  function enableResizing() {
+    setResize(!resize);
+  }
 
   return (
-    <div ref={drag} style={buttonWrapperStyle} id={id}>
-      <button onDoubleClick={enableResizer} style={buttonStyle}>
-        Submit
+    <div onContextMenu={handleRightClick}>
+      <button
+        onDoubleClick={enableResizing}
+        ref={drag}
+        style={boxStyle}
+        id={id}
+      >
+        Resizable Button
+        {resize && (
+          <>
+            <div
+              style={resizeRightStyle}
+              onMouseDown={(e) => handleResize(e, "right")}
+            />
+            <div
+              style={resizeBottomStyle}
+              onMouseDown={(e) => handleResize(e, "bottom")}
+            />
+          </>
+        )}
       </button>
-      <div
-        style={isResizerEnabled ? resizeHandleStyleRight : hiddenStyle}
-        onMouseDown={(e) => handleResize(e, "right")}
-      />
-      <div
-        style={isResizerEnabled ? resizeHandleStyleBottom : hiddenStyle}
-        onMouseDown={(e) => handleResize(e, "bottom")}
-      />
+      {formVisible && (
+        <div style={formStyle}>
+          <DropdownItem
+            chagneBorderRadius={chagneBorderRadius}
+            changeBackgroundColor={changeBackgroundColor}
+            changeTextColor={changeTextColor}
+          />
+        </div>
+      )}
     </div>
   );
 }
