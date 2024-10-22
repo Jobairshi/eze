@@ -1,7 +1,11 @@
-import React, { useState, CSSProperties, useCallback } from "react";
+import React, { useState, CSSProperties, useCallback, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
-import { Gridgap, GridSize_height, GridSize_width } from "../../exports/GridSize";
+import {
+  Gridgap,
+  GridSize_height,
+  GridSize_width,
+} from "../../exports/GridSize";
 import DropdownItem from "../SubComponents/DropDown"; // Assuming this is your form
 
 const gridHeight = GridSize_height;
@@ -9,24 +13,70 @@ const gridWidth = GridSize_width;
 const grid_gap = Gridgap;
 const containerWidth = 1000;
 const containerHeight = 900;
+const initaIalWidth = gridWidth * 3 + grid_gap * 2 + 2;
+const initialHeight = gridHeight * 3 + grid_gap * 2 + 2;
 
 interface DraggableProps {
   id: string;
   name: string;
   left: number;
   top: number;
+  row: number;
+  column: number;
+  lastrow: number;
+  lastcolumn: number;
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (gridWidth + grid_gap)) * (gridWidth + grid_gap);
-  const snappedY = Math.round(y / (gridHeight + grid_gap)) * (gridHeight + grid_gap);
+  const snappedX =
+    Math.round(x / (gridWidth + grid_gap)) * (gridWidth + grid_gap) -
+    grid_gap +
+    2;
+  const snappedY =
+    Math.round(y / (gridHeight + grid_gap)) * (gridHeight + grid_gap) -
+    grid_gap +
+    2;
   return [snappedX, snappedY];
 }
 
-export default function ResizeBox({ id, name, left, top }: DraggableProps) {
-  const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
+function lastRowCol(
+  startRow: number,
+  startColumn: number,
+  boxWidth: number,
+  boxHeight: number
+) {
+  const boxWidthUnits = Math.round(boxWidth / (gridWidth + grid_gap));
+  const boxHeightUnits = Math.round(boxHeight / (gridHeight + grid_gap));
+
+  const lastColumn = startColumn + boxWidthUnits - 1;
+  const lastRow = startRow + boxHeightUnits - 1;
+
+  return { lastRow, lastColumn };
+}
+
+export default function ResizeBox({
+  id,
+  name,
+  left,
+  top,
+  row,
+  column,
+  lastcolumn,
+  lastrow,
+}: DraggableProps) {
+  const [dimensions, setDimensions] = useState({
+    width: initaIalWidth,
+    height: initialHeight,
+  });
   const [isResizing, setIsResizing] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
+
+  // Add states for storing previous row and column values
+  const [prevLastRow, setPrevLastRow] = useState(lastrow);
+  const [prevLastColumn, setPrevLastColumn] = useState(lastcolumn);
+
+  const [currLastRow, setCurrLastRow] = useState(lastrow);
+  const [currLastColumn, setCurrLastColumn] = useState(lastcolumn);
 
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.Component,
@@ -48,16 +98,16 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     (e: React.MouseEvent, direction: string) => {
       e.preventDefault();
       setIsResizing(true);
-
+  
       const startX = e.clientX;
       const startY = e.clientY;
       const startWidth = dimensions.width;
       const startHeight = dimensions.height;
-
+  
       const onMouseMove = (moveEvent: MouseEvent) => {
         let newWidth = startWidth;
         let newHeight = startHeight;
-
+  
         if (direction === "right") {
           newWidth = Math.min(
             containerWidth - left,
@@ -69,29 +119,53 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
             startHeight + (moveEvent.clientY - startY)
           );
         }
-
-        const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
-        setDimensions({
-          width: Math.max(100, snappedWidth),
-          height: Math.max(100, snappedHeight),
-        });
+  
+        const boxWidth = newWidth;
+        const boxHeight = newHeight;
+  
+        const { lastRow, lastColumn } = lastRowCol(
+          row,
+          column,
+          boxWidth,
+          boxHeight
+        );
+        if ((lastRow !== prevLastRow || lastColumn !== prevLastColumn)) {
+          //  snap to grid
+          const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
+  
+          setDimensions({
+            width: Math.max(initaIalWidth, snappedWidth),
+            height: Math.max(initialHeight, snappedHeight),
+          });
+  
+          setCurrLastColumn(lastColumn);
+          setCurrLastRow(lastRow);
+          setPrevLastRow(lastRow);
+          setPrevLastColumn(lastColumn);
+        } else {
+          
+          setDimensions({
+            width: Math.max(initaIalWidth, newWidth),
+            height: Math.max(initialHeight, newHeight),
+          });
+        }
       };
-
+  
       const onMouseUp = () => {
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
         setIsResizing(false);
       };
-
+  
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [dimensions, left, top]
+    [dimensions, left, top, prevLastRow, prevLastColumn, row, column]
   );
+  
 
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // Toggle form visibility
     setFormVisible((prev) => !prev);
   };
 
@@ -106,13 +180,13 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     width: `${dimensions.width}px`,
     height: `${dimensions.height}px`,
     opacity: isDragging ? 0 : 1,
-    backgroundColor: backgroundColor || "blue", // Use the backgroundColor state
+    backgroundColor: backgroundColor || "blue",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    color: textColor || "white", // Use the textColor state
-    borderRadius: `${borderRadius}px`, // Use the borderRadius state
+    color: textColor || "white",
+    borderRadius: `${borderRadius}px`,
     transition: "background-color 0.3s ease, box-shadow 0.3s ease",
     cursor: isResizing ? "nwse-resize" : "grab",
   };
@@ -163,35 +237,61 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
   function changeBackgroundColor(color: string) {
     setBackgroundColor(color);
   }
+
   function changeTextColor(color: string) {
     setTextColor(color);
   }
 
-  
- 
   const [resize, setResize] = useState(false);
   function enableResizing() {
     setResize(!resize);
   }
+
+  useEffect(()=>{
+    const { lastRow, lastColumn } = lastRowCol(
+      row,
+      column,
+      dimensions.width,
+      dimensions.height
+    );
+    setCurrLastRow(
+      lastRow
+    );
+    setCurrLastColumn(lastColumn)
+  },[row,column])
+
+
+  
+
+ 
+
   return (
     <div onContextMenu={handleRightClick}>
       <div onDoubleClick={enableResizing} ref={drag} style={boxStyle} id={id}>
         Resizable Box
-        {
-          resize && (
-            <>
-             <div
-          style={resizeRightStyle}
-          onMouseDown={(e) => handleResize(e, "right")}
-        />
-        <div
-          style={resizeBottomStyle}
-          onMouseDown={(e) => handleResize(e, "bottom")}
-        />
-            </>
-          )
-        }
-
+        <div style={{fontSize:'10px'}}>
+          <p>
+            {row}, {column}
+          </p>
+          <>
+          {prevLastRow}, {prevLastColumn}
+          </>
+          <p>
+            {currLastRow}, {currLastColumn}
+          </p>
+        </div>
+        {resize && (
+          <>
+            <div
+              style={resizeRightStyle}
+              onMouseDown={(e) => handleResize(e, "right")}
+            />
+            <div
+              style={resizeBottomStyle}
+              onMouseDown={(e) => handleResize(e, "bottom")}
+            />
+          </>
+        )}
       </div>
       {formVisible && (
         <div style={formStyle}>
@@ -205,25 +305,3 @@ export default function ResizeBox({ id, name, left, top }: DraggableProps) {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

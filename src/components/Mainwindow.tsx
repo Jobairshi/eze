@@ -109,18 +109,20 @@ export default function Mainwindow() {
       ))}
 
       {items.map((item) => {
-        const row = Math.ceil(item.top / (gridHeight + grid_gap));
-        const col = Math.ceil(item.left / (gridWidth + grid_gap));
+        const row = Math.round(item.top / (gridHeight + grid_gap)) + 1;
+        const col = Math.round(item.left / (gridWidth + grid_gap)) + 1;
 
         return (
           <div key={item.id} style={{ position: "absolute" }}>
             <DraggableComponent
+              row={row}
+              column={col}
               name={item.name}
               left={item.left}
               top={item.top}
               id={item.id}
             />
-            <div
+            {/* <div
               style={{
                 position: "absolute",
                 top: item.top,
@@ -135,7 +137,7 @@ export default function Mainwindow() {
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <h4>{`Row: ${row}, Col: ${col}`}</h4>
               </div>
-            </div>
+            </div> */}
           </div>
         );
       })}
