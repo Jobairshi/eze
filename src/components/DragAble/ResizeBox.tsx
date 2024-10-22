@@ -280,13 +280,13 @@ export default function ResizeBox({
         Resizable Box
         <div style={{fontSize:'10px'}}>
           <p>
-            {row}, {column}
+           start row column : {row}, {column}
           </p>
           <>
-          {prevLastRow}, {prevLastColumn}
+          previous row column : {prevLastRow}, {prevLastColumn}
           </>
           <p>
-            {currLastRow}, {currLastColumn}
+           last row column : {currLastRow}, {currLastColumn}
           </p>
         </div>
         {resize && (
