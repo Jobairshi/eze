@@ -80,13 +80,13 @@ const DraggableComponent = ({ id, name, left, top,row,column}: DraggableProps) =
   if(name === 'Button')
   {
     return(
-        <Button  id={id} name={name} left={left} top={top} />
+        <Button lastcolumn={lastColumn} lastrow={lastRow} row={row} column={column} id={id} name={name} left={left} top={top} />
     )
   }
   if(name === 'Image')
   {
     return(
-        <Button   id={id} name={name} left={left} top={top} />
+      <Button lastcolumn={lastColumn} lastrow={lastRow} row={row} column={column} id={id} name={name} left={left} top={top} />
     )
   }
   if(name === 'CustomComponent')

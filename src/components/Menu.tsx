@@ -52,13 +52,15 @@ const items: MenuItem[] = [
   },
   {
     key: "3",
+    
     icon: <PictureOutlined style={{ fontSize: "15px" }} />,
     label: <SidebarItem name="Image" />,
   },
   {
     key: "4",
+    disabled: true,
     icon: <Html5Outlined style={{ fontSize: "15px" }} />,
-    label: <SidebarItem name="CustomComponent" />,
+    label: <SidebarItem  name="CustomComponent it is not fixed" />,
   },
 ];
 

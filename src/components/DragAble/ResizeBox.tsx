@@ -6,7 +6,7 @@ import {
   GridSize_height,
   GridSize_width,
 } from "../../exports/GridSize";
-import DropdownItem from "../SubComponents/DropDown"; // Assuming this is your form
+import DropdownItem from "../SubComponents/DropDown"; 
 
 const gridHeight = GridSize_height;
 const gridWidth = GridSize_width;
@@ -71,7 +71,6 @@ export default function ResizeBox({
   const [isResizing, setIsResizing] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
 
-  // Add states for storing previous row and column values
   const [prevLastRow, setPrevLastRow] = useState(lastrow);
   const [prevLastColumn, setPrevLastColumn] = useState(lastcolumn);
 
@@ -103,7 +102,7 @@ export default function ResizeBox({
       const startY = e.clientY;
       const startWidth = dimensions.width;
       const startHeight = dimensions.height;
-      let flag = false; // Declare flag variable
+      let flag = false; 
   
       const onMouseMove = (moveEvent: MouseEvent) => {
         let newWidth = startWidth;
