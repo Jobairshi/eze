@@ -1,1 +1,2 @@
-export const GridSize = 10;
+export const GridSize = 30;
+export const Gridgap = 20;

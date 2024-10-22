@@ -2,10 +2,10 @@ import { CSSProperties, isValidElement, useEffect, useRef, useState } from "reac
 import { useDrop } from "react-dnd";
 import DraggableComponent from "./DragCom";
 import { ItemTypes } from "../types/ItemTypes";
-import { GridSize } from "../exports/GridSize";
+import { Gridgap, GridSize } from "../exports/GridSize";
 
 const grd_sz = GridSize;
-const grid_gap = 3;
+const grid_gap = Gridgap;
 
 interface item {
   id: string;
@@ -15,8 +15,8 @@ interface item {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap + 0.07);
-  const snappedY = Math.round(y / (grd_sz + grid_gap )) * (grd_sz + grid_gap + 0.15 );
+  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap );
+  const snappedY = Math.round(y / (grd_sz + grid_gap )) * (grd_sz + grid_gap  );
   return [snappedX, snappedY];
 }
 

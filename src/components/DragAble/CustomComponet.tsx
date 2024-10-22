@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from '../../types/ItemTypes'; 
-import { GridSize } from '../../exports/GridSize';
+import { Gridgap, GridSize } from '../../exports/GridSize';
 
 const grd_sz = GridSize;
-const grid_gap = 3;
+const grid_gap = Gridgap;
 const containerWidth = 1000;
 const containerHeight = 900;
 function snapToGrid(x: number, y: number): [number, number] {
