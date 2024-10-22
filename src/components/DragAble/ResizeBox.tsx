@@ -162,6 +162,7 @@ export default function ResizeBox({
         }
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
+        setIsResizing(false);
       };
   
       document.addEventListener("mousemove", onMouseMove);
