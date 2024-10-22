@@ -6,7 +6,8 @@ import {
   GridSize_height,
   GridSize_width,
 } from "../../exports/GridSize";
-import DropdownItem from "../SubComponents/DropDown"; 
+import DropdownItem from "../SubComponents/DropDown";
+
 
 const gridHeight = GridSize_height;
 const gridWidth = GridSize_width;
@@ -93,21 +94,53 @@ export default function ResizeBox({
     canDrag: () => !isResizing,
   });
 
+  function doSomething(newWidth: number, newHeight: number) {
+    let flag = false;
+    const boxWidth = newWidth;
+    const boxHeight = newHeight;
+
+    const { lastRow, lastColumn } = lastRowCol(
+      row,
+      column,
+      boxWidth,
+      boxHeight
+    );
+    if (lastRow !== prevLastRow || lastColumn !== prevLastColumn) {
+      //  snap to grid
+      const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
+
+      setDimensions({
+        width: Math.max(initaIalWidth, snappedWidth),
+        height: Math.max(initialHeight, snappedHeight),
+      });
+
+      setCurrLastColumn(lastColumn);
+      setCurrLastRow(lastRow);
+      setPrevLastRow(lastRow);
+      setPrevLastColumn(lastColumn);
+      flag = true;
+    } else {
+      setDimensions({
+        width: Math.max(initaIalWidth, newWidth),
+        height: Math.max(initialHeight, newHeight),
+      });
+    }
+    return flag;
+  }
+
   const handleResize = useCallback(
     (e: React.MouseEvent, direction: string) => {
       e.preventDefault();
       setIsResizing(true);
-  
+
       const startX = e.clientX;
       const startY = e.clientY;
       const startWidth = dimensions.width;
       const startHeight = dimensions.height;
-      let flag = false; 
-  
+
+      let newWidth = startWidth;
+      let newHeight = startHeight;
       const onMouseMove = (moveEvent: MouseEvent) => {
-        let newWidth = startWidth;
-        let newHeight = startHeight;
-  
         if (direction === "right") {
           newWidth = Math.min(
             containerWidth - left,
@@ -119,57 +152,31 @@ export default function ResizeBox({
             startHeight + (moveEvent.clientY - startY)
           );
         }
-  
-        const boxWidth = newWidth;
-        const boxHeight = newHeight;
-  
-        const { lastRow, lastColumn } = lastRowCol(
-          row,
-          column,
-          boxWidth,
-          boxHeight
-        );
-        if ((lastRow !== prevLastRow || lastColumn !== prevLastColumn)) {
-          //  snap to grid
-          const [snappedWidth, snappedHeight] = snapToGrid(newWidth, newHeight);
-  
-          setDimensions({
-            width: Math.max(initaIalWidth, snappedWidth),
-            height: Math.max(initialHeight, snappedHeight),
-          });
-  
-          setCurrLastColumn(lastColumn);
-          setCurrLastRow(lastRow);
-          setPrevLastRow(lastRow);
-          setPrevLastColumn(lastColumn);
-          flag = true;
-        } else {
-          
-          setDimensions({
-            width: Math.max(initaIalWidth, newWidth),
-            height: Math.max(initialHeight, newHeight),
-          });
-        }
+        setDimensions({
+          width: newWidth,
+          height: newHeight,
+        });
       };
-  
+
       const onMouseUp = () => {
-        if(!flag){
-         setDimensions({
+        const flag = doSomething(newWidth, newHeight);
+        console.log("i am mouse up");
+        if (!flag) {
+          setDimensions({
             width: Math.max(initaIalWidth, dimensions.width),
             height: Math.max(initialHeight, dimensions.height),
-         })
+          });
         }
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
         setIsResizing(false);
       };
-  
+
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
     [dimensions, left, top, prevLastRow, prevLastColumn, row, column]
   );
-  
 
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -204,8 +211,6 @@ export default function ResizeBox({
     cursor: "e-resize",
     zIndex: 10,
   };
-
- 
 
   const resizeRightStyle: CSSProperties = {
     ...resizeBarStyle,
@@ -256,37 +261,30 @@ export default function ResizeBox({
     setResize(!resize);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     const { lastRow, lastColumn } = lastRowCol(
       row,
       column,
       dimensions.width,
       dimensions.height
     );
-    setCurrLastRow(
-      lastRow
-    );
-    setCurrLastColumn(lastColumn)
-  },[row,column])
-
-
-  
-
- 
+    setCurrLastRow(lastRow);
+    setCurrLastColumn(lastColumn);
+  }, [row, column]);
 
   return (
     <div onContextMenu={handleRightClick}>
       <div onDoubleClick={enableResizing} ref={drag} style={boxStyle} id={id}>
         Resizable Box
-        <div style={{fontSize:'10px'}}>
+        <div style={{ fontSize: "10px" }}>
           <p>
-           start row column : {row}, {column}
+            start row column : {row}, {column}
           </p>
           <>
-          previous row column : {prevLastRow}, {prevLastColumn}
+            previous row column : {prevLastRow}, {prevLastColumn}
           </>
           <p>
-           last row column : {currLastRow}, {currLastColumn}
+            last row column : {currLastRow}, {currLastColumn}
           </p>
         </div>
         {resize && (
