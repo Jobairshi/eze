@@ -103,6 +103,7 @@ export default function ResizeBox({
       const startY = e.clientY;
       const startWidth = dimensions.width;
       const startHeight = dimensions.height;
+      let flag = false; // Declare flag variable
   
       const onMouseMove = (moveEvent: MouseEvent) => {
         let newWidth = startWidth;
@@ -142,6 +143,7 @@ export default function ResizeBox({
           setCurrLastRow(lastRow);
           setPrevLastRow(lastRow);
           setPrevLastColumn(lastColumn);
+          flag = true;
         } else {
           
           setDimensions({
@@ -152,9 +154,14 @@ export default function ResizeBox({
       };
   
       const onMouseUp = () => {
+        if(!flag){
+         setDimensions({
+            width: Math.max(initaIalWidth, dimensions.width),
+            height: Math.max(initialHeight, dimensions.height),
+         })
+        }
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
-        setIsResizing(false);
       };
   
       document.addEventListener("mousemove", onMouseMove);
@@ -197,6 +204,8 @@ export default function ResizeBox({
     cursor: "e-resize",
     zIndex: 10,
   };
+
+ 
 
   const resizeRightStyle: CSSProperties = {
     ...resizeBarStyle,
