@@ -1,10 +1,12 @@
 import React, { useState, CSSProperties, useCallback } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes } from "../../types/ItemTypes";
-import { Gridgap, GridSize } from "../../exports/GridSize";
-import DropdownItem from "../SubComponents/DropDown"; // Assuming this is your form
 
-const grd_sz = GridSize;
+import DropdownItem from "../SubComponents/DropDown"; // Assuming this is your form
+import { Gridgap, GridSize_height, GridSize_width } from "../../exports/GridSize";
+
+const gridHeight = GridSize_height;
+const gridWidth = GridSize_width;
 const grid_gap = Gridgap;
 const containerWidth = 1000;
 const containerHeight = 900;
@@ -17,11 +19,10 @@ interface DraggableProps {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
-  const snappedY = Math.round(y / (grd_sz + grid_gap)) * (grd_sz + grid_gap);
+  const snappedX = Math.round(x / (gridWidth + grid_gap)) * (gridWidth + grid_gap);
+  const snappedY = Math.round(y / (gridHeight + grid_gap)) * (gridHeight + grid_gap);
   return [snappedX, snappedY];
 }
-
 export default function Button({ id, name, left, top }: DraggableProps) {
   const [dimensions, setDimensions] = useState({ width: 100, height: 50 });
   const [isResizing, setIsResizing] = useState(false);

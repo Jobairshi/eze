@@ -1,10 +1,11 @@
-import { CSSProperties, isValidElement, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useDrop } from "react-dnd";
 import DraggableComponent from "./DragCom";
 import { ItemTypes } from "../types/ItemTypes";
-import { Gridgap, GridSize } from "../exports/GridSize";
+import { Gridgap, GridSize_height, GridSize_width } from "../exports/GridSize";
 
-const grd_sz = GridSize;
+const gridHeight = GridSize_height;
+const gridWidth = GridSize_width;
 const grid_gap = Gridgap;
 
 interface item {
@@ -15,20 +16,17 @@ interface item {
 }
 
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) * (grd_sz + grid_gap );
-  const snappedY = Math.round(y / (grd_sz + grid_gap )) * (grd_sz + grid_gap  );
+  const snappedX =
+    Math.round(x / (gridWidth + grid_gap)) * (gridWidth + grid_gap);
+  const snappedY =
+    Math.round(y / (gridHeight + grid_gap)) * (gridHeight + grid_gap);
   return [snappedX, snappedY];
 }
 
 export default function Mainwindow() {
-  
-  const [items, setItems] = useState<item[]>( []
-    // JSON.parse(localStorage.getItem("items") || "[]")
-  );
+  const [items, setItems] = useState<item[]>([]);
   const dropRef = useRef<HTMLDivElement>(null);
   const [id, setId] = useState<string>("");
-  const [tracX, setTracX] = useState<number>(0);
-  const [tracY, setTracY] = useState<number>(0);
 
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.Component,
@@ -38,31 +36,22 @@ export default function Mainwindow() {
         return;
       }
       const { id, name } = item;
-      console.log(item.left, item.top);
-      console.log(delta.x, delta.y);
-      setTracX(delta.x);
-      setTracY(delta.y);
-      let flag = false;
       let left = Math.round(item.left + delta.x);
       let top = Math.round(item.top + delta.y);
+
       if (isNaN(item.left) || isNaN(item.top)) {
         const temps = monitor.getInitialClientOffset();
-        
-        if(!temps)
-          return;
+        if (!temps) return;
         left = temps.x;
         top = temps.y;
-       console.log('first time left, right ', left, top);
-        flag = true;
       }
-      console.log(left, top);
-      
-     //   console.log('i am in snap');
-        [left, top] = snapToGrid(left, top);
-      
+
+      [left, top] = snapToGrid(left, top);
 
       setItems((prevItems) => {
-        const exist = prevItems.findIndex((existingItem) => existingItem.id === id);
+        const exist = prevItems.findIndex(
+          (existingItem) => existingItem.id === id
+        );
         if (exist !== -1) {
           const updatedItems = [...prevItems];
           updatedItems[exist] = { ...updatedItems[exist], left, top };
@@ -77,85 +66,74 @@ export default function Mainwindow() {
       canDrop: monitor.canDrop(),
     }),
   }));
-  
 
-  const gridWidth = 1000;
-  const gridHeight = 900;
-  const numCols = Math.floor(gridWidth / (grd_sz + grid_gap));
-  const numRows = Math.floor(gridHeight / (grd_sz + grid_gap));
+  const con_w = 1000;
+  const con_h = 900;
+
+  const numCols = Math.floor(con_w / (gridWidth + grid_gap));
+  const numRows = Math.floor(con_h / (gridHeight + grid_gap));
 
   const gridCells = Array.from({ length: numCols * numRows }, (_, index) => ({
     row: Math.floor(index / numCols),
     col: index % numCols,
   }));
 
-  // useEffect(() => {
-  //   if (id) {
-  //     //localStorage.setItem("items", JSON.stringify(items));
-  //     localStorage.setItem('fullwindow', JSON.stringify(dropRef.current));
-  //     // console.log(dropRef.current);
-  //   }
-  // }, [id]);
-   const isActive = isOver && canDrop;
-   drop(dropRef)
+  const isActive = isOver && canDrop;
+  drop(dropRef);
+
   return (
     <div
       ref={dropRef}
       className="parent"
       style={{
         display: "grid",
-        gridTemplateColumns: `repeat(${numCols}, ${grd_sz}px)`,
-        gridTemplateRows: `repeat(${numRows}, ${grd_sz}px)`,
-        gridGap: `${grid_gap}px`,
-        width: `${gridWidth}px`,
-        height: `${gridHeight}px`,
+        gridTemplateColumns: `repeat(${numCols}, ${gridWidth}px)`,
+        gridTemplateRows: `repeat(${numRows}, ${gridHeight}px)`,
+        gap: `${grid_gap}px`,
+        width: `${con_w}px`,
+        height: `${con_h}px`,
         border: "2px solid black",
         position: "relative",
       }}
     >
-      
-      { gridCells.map(({ row, col }) => (
+      {gridCells.map(({ row, col }) => (
         <div
           key={`${row}-${col}`}
           style={{
-            position:'absolute',
-            margin: 2,
-            top: row * (grd_sz + grid_gap),
-            left: col * (grd_sz + grid_gap),
-            width: grd_sz,
-            height: grd_sz,
+            width: gridWidth,
+            height: gridHeight,
             border: "1px solid #ddd",
-            boxSizing: "border-box",
-            backgroundColor:isActive? 'black':'transparent',
+            backgroundColor: isActive ? "black" : "transparent",
           }}
         />
       ))}
 
       {items.map((item) => {
-        const row = Math.ceil(item.top / (grd_sz + grid_gap));
-        const col = Math.ceil(item.left / (grd_sz + grid_gap));
+        const row = Math.ceil(item.top / (gridHeight + grid_gap));
+        const col = Math.ceil(item.left / (gridWidth + grid_gap));
+
         return (
-          <div  key={item.id} style={{ position: 'relative' }}>
+          <div key={item.id} style={{ position: "absolute" }}>
             <DraggableComponent
-         
               name={item.name}
               left={item.left}
               top={item.top}
               id={item.id}
             />
-            <div style={{
-              position: 'absolute',
-              top: item.top,
-              left: item.left,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: 'white',
-              padding: '2px',
-              borderRadius: '3px',
-              fontSize: '12px',
-            }}>
-              <div style={{display:'flex', flexDirection:'column'}}>
-                <h4 style={{display:'flex', flexDirection:'row'}}> {`Row: ${row}, Col: ${col}`}</h4>
-                {/* <h4 style={{display:'flex', flexDirection:'row'}}> {`Top: ${Math.floor(item.top)}, Left: ${Math.floor(item.left)}`}</h4> */}
+            <div
+              style={{
+                position: "absolute",
+                top: item.top,
+                left: item.left,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                color: "white",
+                padding: "2px",
+                borderRadius: "3px",
+                fontSize: "12px",
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <h4>{`Row: ${row}, Col: ${col}`}</h4>
               </div>
             </div>
           </div>

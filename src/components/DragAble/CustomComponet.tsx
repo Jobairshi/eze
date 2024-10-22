@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDrag } from 'react-dnd';
 import { ItemTypes } from '../../types/ItemTypes'; 
-import { Gridgap, GridSize } from '../../exports/GridSize';
+import { Gridgap, GridSize_height, GridSize_width } from '../../exports/GridSize';
 
-const grd_sz = GridSize;
+const gridHeight = GridSize_height;
+const gridWidth = GridSize_width;
 const grid_gap = Gridgap;
 const containerWidth = 1000;
 const containerHeight = 900;
 function snapToGrid(x: number, y: number): [number, number] {
-  const snappedX = Math.round(x / (grd_sz + grid_gap)) *( grd_sz + grid_gap);
-  const snappedY = Math.round(y / (grd_sz + grid_gap) ) * (grd_sz + grid_gap);
+  const snappedX = Math.round(x / (gridWidth + grid_gap)) * (gridWidth + grid_gap);
+  const snappedY = Math.round(y / (gridHeight + grid_gap)) * (gridHeight + grid_gap);
   return [snappedX, snappedY];
 }
 
